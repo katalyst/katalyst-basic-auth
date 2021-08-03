@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockLength
-  subject { described_class }
+  subject { described_class.new }
 
   def with_environment(name, value)
     orig      = ENV[name]
@@ -46,8 +46,8 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
     let(:rails_env) { "development" }
 
     around(:each) do |example|
-      rails = Object.const_set("Rails", Class.new)
-      env   = DummyRailsEnv.new
+      rails     = Object.const_set("Rails", DummyRails)
+      env       = DummyRailsEnv.new
       env.value = rails_env
       rails.define_singleton_method(:env) { env }
 
@@ -91,6 +91,29 @@ RSpec.describe Katalyst::Basic::Auth::Config do # rubocop:disable Metrics/BlockL
 
     it "is not enabled" do
       expect(subject.enabled?).to be_falsey
+    end
+  end
+
+  describe "#description" do
+    it "describes basic auth configuration" do
+      expect(described_class.description).to be_kind_of(String)
+    end
+  end
+
+  describe "#for_path" do
+    let!(:config1) { described_class.add(path: "/path1", username: "user1") }
+    let!(:config2) { described_class.add(path: "/path2", username: "user2") }
+
+    it "matches path 1" do
+      expect(described_class.for_path("/path1/foo/bar.html")).to eq(config1)
+    end
+
+    it "matches path 2" do
+      expect(described_class.for_path("/path2/foo/bar.html")).to eq(config2)
+    end
+
+    it "matches the global config" do
+      expect(described_class.for_path("/path3/foo/bar.html")).to eq(described_class.global)
     end
   end
 end

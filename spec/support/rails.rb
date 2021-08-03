@@ -11,3 +11,31 @@ class DummyRailsEnv
     end
   end
 end
+
+class DummyRails
+  module VERSION
+    MAJOR = 4
+  end
+
+  class Application
+    class << self
+      def module_parent_name
+        self
+      end
+
+      def parent_name
+        self
+      end
+
+      def underscore
+        "app"
+      end
+    end
+  end
+
+  class << self
+    def application
+      Application.new
+    end
+  end
+end

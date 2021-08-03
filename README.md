@@ -37,6 +37,16 @@ The gem provides a rake task that can be used to query basic auth settings:
 
     $ rake katalyst_basic_auth:info  
 
+Additional paths can be password protected by adding configuration to an initializer. e.g.
+
+    Katalyst::Basic::Auth.add("/secure-path", username: "user", password: "pass") if Rails.env.production?
+
+The username and password parameters are optional. Use the rake task to find the default settings.
+
+Paths can also be excluded from basic auth. e.g. to allow access to `/public` without basic authentication:
+
+    Katalyst::Basic::Auth.exclude("/public")
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
