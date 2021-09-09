@@ -11,8 +11,11 @@ module Katalyst
         end
 
         def call(env)
+          config = Config.for_path(env["PATH_INFO"])
+          return @app.call(env) unless config.enabled?
+
           auth = Rack::Auth::Basic.new(app) do |u, p|
-            u == Config.username && p == Config.password
+            u == config.username && p == config.password
           end
           auth.call env
         end
